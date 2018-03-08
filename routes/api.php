@@ -24,6 +24,7 @@ Route::post('login', 'AuthController@login');
 Route::post('recover', 'AuthController@recover');
 Route::group(['middleware' => ['jwt.auth']], function() {
     Route::get('logout', 'AuthController@logout');
+
     Route::get('test', function(){
         return response()->json(['foo'=>'bar']);
     });
@@ -38,3 +39,9 @@ Route::group(['middleware' => ['jwt.auth']], function() {
 
     Route::delete('rooms/{id?}', 'RoomController@delete');
 });
+
+Route::post('photo/upload', 'PhotoController@upload');
+Route::get('photos', 'PhotoController@view');
+Route::get('photo/{id?}', 'PhotoController@show');
+Route::delete('photo/{id?}', 'PhotoController@delete');
+Route::get('photo/{filename?}', 'PhotoController@file');

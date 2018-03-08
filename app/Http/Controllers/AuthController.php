@@ -32,7 +32,7 @@ class AuthController extends Controller
         $validator = Validator::make($input, $rules);
         if($validator->fails()) {
             $error = $validator->messages()->toJson();
-            return response()->json(['success'=> false, 'error'=> $error]);
+            return response()->json($error);
         }
         $name = $request->name;
         $email = $request->email;
@@ -68,7 +68,7 @@ class AuthController extends Controller
                 'message'=> 'You have successfully verified your email address.'
             ]);
         }
-        return response()->json(['success'=> false, 'error'=> "Verification code is invalid."]);
+        return response()->json("Verification code is invalid.");
     }
 
 
@@ -81,28 +81,28 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $rules = [
-            'email' => 'required|email',
+            'username' => 'required|email',
             'password' => 'required',
         ];
-        $input = $request->only('email', 'password');
+        $input = $request->only('username', 'password');
         $validator = Validator::make($input, $rules);
         if($validator->fails()) {
             $error = $validator->messages()->toJson();
-            return response()->json(['success'=> false, 'error'=> $error]);
+            return response()->json('Email or password invalid', 500);
         }
         $credentials = [
-            'email' => $request->email,
+            'email' => $request->username,
             'password' => $request->password,
             'is_verified' => 1
         ];
         try {
             // attempt to verify the credentials and create a token for the user
             if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['success' => false, 'error' => 'Invalid Credentials. Please make sure you entered the right information and you have verified your email address.'], 401);
+                return response()->json('Invalid Credentials. Please make sure you entered the right information and you have verified your email address.', 401);
             }
         } catch (JWTException $e) {
             // something went wrong whilst attempting to encode the token
-            return response()->json(['success' => false, 'error' => 'could_not_create_token'], 500);
+            return response()->json('could_not_create_token', 500);
         }
         // all good so return the token
         return response()->json(['success' => true, 'data'=> [ 'token' => $token ]]);
@@ -121,7 +121,7 @@ class AuthController extends Controller
             return response()->json(['success' => true]);
         } catch (JWTException $e) {
             // something went wrong whilst attempting to encode the token
-            return response()->json(['success' => false, 'error' => 'Failed to logout, please try again.'], 500);
+            return response()->json('Failed to logout, please try again.', 500);
         }
     }
 
@@ -146,7 +146,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             //Return with error
             $error_message = $e->getMessage();
-            return response()->json(['success' => false, 'error' => $error_message], 401);
+            return response()->json($error_message, 401);
         }
         return response()->json([
             'success' => true, 'data'=> ['msg'=> 'A reset email has been sent! Please check your email.']
