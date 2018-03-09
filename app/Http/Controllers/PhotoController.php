@@ -78,11 +78,13 @@ class PhotoController extends Controller
 
     public function delete($id)
     {
-        $item = Photo::delete($id);
+        $item = Photo::find($id);
         if($item == null){
             return response()->json('No photo', 200);
         }else{
             //delete file
+            $item->delete();
+            unlink(public_path('images').'/'.$item->image);
         }
         return response()->json([
             'success'=> true,
