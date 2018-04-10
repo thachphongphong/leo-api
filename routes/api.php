@@ -45,3 +45,4 @@ Route::get('photos', 'PhotoController@view');
 Route::get('photo/{id?}', 'PhotoController@show');
 Route::delete('photo/{id?}', 'PhotoController@delete');
 Route::get('photo/{filename?}', 'PhotoController@file');
+Route::put('photo/edit', 'PhotoController@edit');

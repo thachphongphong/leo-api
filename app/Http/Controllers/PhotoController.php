@@ -56,7 +56,7 @@ class PhotoController extends Controller
     {
         $item= Photo::all();
         if($item == null){
-            return response()->json('No photo', 200);
+            return response()->json('Photo not found', 200);
         }
         return response()->json([
             'success'=> true,
@@ -68,7 +68,7 @@ class PhotoController extends Controller
     {
         $item = Photo::find($id);
         if($item == null){
-            return response()->json('No photo', 200);
+            return response()->json('Photo not found', 200);
         }
         return response()->json([
             'success'=> true,
@@ -80,11 +80,39 @@ class PhotoController extends Controller
     {
         $item = Photo::find($id);
         if($item == null){
-            return response()->json('No photo', 200);
+            return response()->json('Photo not found', 500);
         }else{
             //delete file
             $item->delete();
             unlink(public_path('images').'/'.$item->image);
+        }
+        return response()->json([
+            'success'=> true,
+            'data'=> $item
+        ]);
+    }
+
+    public function edit(Request $request)
+    {
+        $item = Photo::find($request->id);
+        if($item == null){
+            return response()->json('Photo not found', 500);
+        }else{
+            Log::info("Update photo: ". $request->title);
+
+            $validator = Validator::make($request->all(), [
+                'title' => 'required',
+                'category' => 'required',
+            ]);
+
+            if($validator->fails()) {
+                $error = $validator->messages()->toJson();
+                Log::error($error);
+                return response()->json($error, 500);
+            }
+            $item->title = $request->title;
+            $item->category = $request->category;
+            $item->save();
         }
         return response()->json([
             'success'=> true,
@@ -97,7 +125,7 @@ class PhotoController extends Controller
         $path = storage_path('public/images/' . $filename);
 
         if (!File::exists($path)) {
-            response()->json('Image not found', 404);
+            response()->json('Photo not found', 404);
         }
 
         $file = File::get($path);
